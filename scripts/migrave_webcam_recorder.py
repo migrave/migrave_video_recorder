@@ -13,23 +13,23 @@ class VideoCapture:
     def __init__(
         self,
         is_record_topic,
-        color_image_topic,
-        depth_image_topic,
+        left_image_topic,
+        right_image_topic,
         video_type,
         video_dimensions,
         frames_per_second,
         out_directory,
     ):
 
-        rospy.init_node("migrave_video_recorder", anonymous=True)
-        self._color_video_recorder = video_recorder(
+        rospy.init_node("migrave_webcam_recorder", anonymous=True)
+        self._left_video_recorder = video_recorder(
             video_type=video_type,
             video_dimensions=video_dimensions,
             frames_per_second=frames_per_second,
             out_directory=out_directory,
         )
 
-        self._depth_video_recorder = video_recorder(
+        self._right_video_recorder = video_recorder(
             video_type=video_type,
             video_dimensions=video_dimensions,
             frames_per_second=frames_per_second,
@@ -39,36 +39,36 @@ class VideoCapture:
         self._is_record_subscriber = rospy.Subscriber(
             is_record_topic, Bool, self._is_record_callback
         )
-        self._color_image_subscriber = rospy.Subscriber(
-            color_image_topic, Image, self._color_image_callback
+        self._left_image_subscriber = rospy.Subscriber(
+            left_image_topic, Image, self._left_image_callback
         )
-        self._depth_image_subscriber = rospy.Subscriber(
-            depth_image_topic, Image, self._depth_image_callback
+        self._right_image_subscriber = rospy.Subscriber(
+            right_image_topic, Image, self._right_image_callback
         )
         self._bridge = CvBridge()
 
         # This flag is used to block recording if memory exceeeds limits
         self._allow_recording = True  # TODO add a memory usage watch topic
 
-    def _color_image_callback(self, data):
+    def _left_image_callback(self, data):
 
         try:
             cv_image = self._bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
             raise e
 
-        self._color_video_recorder.add_image(
+        self._left_video_recorder.add_image(
             cv_image, is_throw_error_if_not_recording=False
         )
 
-    def _depth_image_callback(self, data):
+    def _right_image_callback(self, data):
 
         try:
             cv_image = self._bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
             raise e
 
-        self._depth_video_recorder.add_image(
+        self._right_video_recorder.add_image(
             cv_image, is_throw_error_if_not_recording=False
         )
 
@@ -81,28 +81,27 @@ class VideoCapture:
                     # rospy.loginfo("Starting to record video")
                     ext = video_type
                     file_name = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                    color_video_file = f"color_{file_name}.{ext}"
-                    depth_video_file = f"depth_{file_name}.{ext}"
-                    rospy.loginfo("Starting to record color video")
-                    self._color_video_recorder.start_recording(
-                        out_file_name=color_video_file
+                    left_video_file = f"camera_left_{file_name}.{ext}"
+                    right_video_file = f"camera_right_{file_name}.{ext}"
+                    rospy.loginfo("Starting to record left video")
+                    self._left_video_recorder.start_recording(
+                        out_file_name=left_video_file
                     )
-                    rospy.loginfo("Starting to record depth video")
-                    self._depth_video_recorder.start_recording(
-                        out_file_name=depth_video_file
+                    rospy.loginfo("Starting to record right video")
+                    self._right_video_recorder.start_recording(
+                        out_file_name=right_video_file
                     )
                 else:
                     rospy.logerr(
-                        "Recording will not happen "
-                        "due to memory limits exceeded"
+                        "Recording will not happen " "due to memory limits exceeded"
                     )
             else:
-                if self._color_video_recorder._is_recording:
-                    rospy.loginfo("Stopped recording color video")
-                    self._color_video_recorder.stop_recording()
-                if self._depth_video_recorder._is_recording:
-                    rospy.loginfo("Stopped recording depth video")
-                    self._depth_video_recorder.stop_recording()
+                if self._left_video_recorder._is_recording:
+                    rospy.loginfo("Stopped recording left video")
+                    self._left_video_recorder.stop_recording()
+                if self._right_video_recorder._is_recording:
+                    rospy.loginfo("Stopped recording right video")
+                    self._right_video_recorder.stop_recording()
 
         except RuntimeError as e:
             rospy.logerr(e)
@@ -110,17 +109,17 @@ class VideoCapture:
 
 if __name__ == "__main__":
     # TODO parameters as ROS parameters
-    color_image_topic = "/camera/color/image_raw"
-    depth_image_topic = "/camera/depth/image_raw"
+    left_image_topic = "/camera1/usb_cam1/image_raw"
+    right_image_topic = "/camera2/usb_cam2/image_raw"
     is_record_topic = "/migrave_data_recording/is_record"
     video_type = "mp4"
     video_dimensions = "480p"
-    frames_per_second = 23
+    frames_per_second = 15
     output_directory = "/home/qtrobot/Documents"
     VideoCapture(
-        color_image_topic=color_image_topic,
-        depth_image_topic=depth_image_topic,
         is_record_topic=is_record_topic,
+        left_image_topic=left_image_topic,
+        right_image_topic=right_image_topic,
         video_type=video_type,
         video_dimensions=video_dimensions,
         frames_per_second=frames_per_second,
