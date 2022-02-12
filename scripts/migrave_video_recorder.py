@@ -5,6 +5,7 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import Bool
 from cv_bridge import CvBridge, CvBridgeError
 from datetime import datetime
+import cv2
 
 from video_recorder.video_recorder import video_recorder
 
@@ -16,7 +17,8 @@ class VideoCapture:
         color_image_topic,
         depth_image_topic,
         video_type,
-        video_dimensions,
+        video_dimensions_color,
+        video_dimensions_depth,
         frames_per_second,
         out_directory,
     ):
@@ -24,14 +26,14 @@ class VideoCapture:
         rospy.init_node("migrave_video_recorder", anonymous=True)
         self._color_video_recorder = video_recorder(
             video_type=video_type,
-            video_dimensions=video_dimensions,
+            video_dimensions=video_dimensions_color,
             frames_per_second=frames_per_second,
             out_directory=out_directory,
         )
 
         self._depth_video_recorder = video_recorder(
             video_type=video_type,
-            video_dimensions=video_dimensions,
+            video_dimensions=video_dimensions_depth,
             frames_per_second=frames_per_second,
             out_directory=out_directory,
         )
@@ -64,7 +66,13 @@ class VideoCapture:
     def _depth_image_callback(self, data):
 
         try:
-            cv_image = self._bridge.imgmsg_to_cv2(data, "bgr8")
+            cv_image = self._bridge.imgmsg_to_cv2(
+                data, data.encoding)  # z16 format
+            cv_image = cv2.applyColorMap(
+                cv2.convertScaleAbs(cv_image, alpha=0.03), cv2.COLORMAP_JET
+            )
+            # cv_image = self._bridge.imgmsg_to_cv2(
+            #     data, desired_encoding="16UC1")  # z16 format
         except CvBridgeError as e:
             raise e
 
@@ -93,8 +101,7 @@ class VideoCapture:
                     )
                 else:
                     rospy.logerr(
-                        "Recording will not happen "
-                        "due to memory limits exceeded"
+                        "Recording will not happen " "due to memory limits exceeded"
                     )
             else:
                 if self._color_video_recorder._is_recording:
@@ -109,20 +116,60 @@ class VideoCapture:
 
 
 if __name__ == "__main__":
-    # TODO parameters as ROS parameters
+    # default parameters
     color_image_topic = "/camera/color/image_raw"
-    depth_image_topic = "/camera/depth/image_raw"
+    # depth_image_topic = "/camera/depth/image_raw"
+    depth_image_topic = "/camera/aligned_depth_to_color/image_raw"
     is_record_topic = "/migrave_data_recording/is_record"
     video_type = "mp4"
-    video_dimensions = "480p"
-    frames_per_second = 23
+    video_dimensions_color = "480p"
+    video_dimensions_depth = "480p"
+    frames_per_second = 30
     output_directory = "/home/qtrobot/Documents"
+    # update parameter if provided by ros parameter server
+    parameter_name = "/migrave_video_recorder/color_image_topic"
+    if rospy.has_param(parameter_name):
+        color_image_topic = rospy.get_param(parameter_name)
+
+    parameter_name = "/migrave_video_recorder/depth_image_topic"
+    if rospy.has_param(parameter_name):
+        depth_image_topic = rospy.get_param(parameter_name)
+
+    parameter_name = "/migrave_video_recorder/is_record_topic"
+    if rospy.has_param(parameter_name):
+        is_record_topic = rospy.get_param(parameter_name)
+
+    parameter_name = "/migrave_video_recorder/is_record_topic"
+    if rospy.has_param(parameter_name):
+        is_record_topic = rospy.get_param(parameter_name)
+
+    parameter_name = "/migrave_video_recorder/video_type"
+    if rospy.has_param(parameter_name):
+        video_type = rospy.get_param(parameter_name)
+
+    parameter_name = "/migrave_video_recorder/video_dimensions_color"
+    if rospy.has_param(parameter_name):
+        video_dimensions_color = rospy.get_param(parameter_name)
+
+    parameter_name = "/migrave_video_recorder/video_dimensions_depth"
+    if rospy.has_param(parameter_name):
+        video_dimensions_depth = rospy.get_param(parameter_name)
+
+    parameter_name = "/migrave_video_recorder/frames_per_second"
+    if rospy.has_param(parameter_name):
+        frames_per_second = rospy.get_param(parameter_name)
+
+    parameter_name = "/migrave_video_recorder/out_directory"
+    if rospy.has_param(parameter_name):
+        out_directory = rospy.get_param(parameter_name)
+
     VideoCapture(
         color_image_topic=color_image_topic,
         depth_image_topic=depth_image_topic,
         is_record_topic=is_record_topic,
         video_type=video_type,
-        video_dimensions=video_dimensions,
+        video_dimensions_color=video_dimensions_color,
+        video_dimensions_depth=video_dimensions_depth,
         frames_per_second=frames_per_second,
         out_directory=output_directory,
     )
