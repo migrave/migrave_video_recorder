@@ -1,12 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 from sensor_msgs.msg import Image
 from std_msgs.msg import Bool
 from cv_bridge import CvBridge, CvBridgeError
 from datetime import datetime
-
-from video_recorder.video_recorder import video_recorder
+import sys, getopt
+import os
+from video_recorder.video_recorder import VideoRecorder
 
 
 class VideoCapture:
@@ -21,15 +22,15 @@ class VideoCapture:
         out_directory,
     ):
 
-        rospy.init_node("migrave_video_recorder", anonymous=True)
-        self._color_video_recorder = video_recorder(
+        rospy.init_node("video_ros_recorder", anonymous=True)
+        self._color_video_recorder = VideoRecorder(
             video_type=video_type,
             video_dimensions=video_dimensions,
             frames_per_second=frames_per_second,
             out_directory=out_directory,
         )
 
-        self._depth_video_recorder = video_recorder(
+        self._depth_video_recorder = VideoRecorder(
             video_type=video_type,
             video_dimensions=video_dimensions,
             frames_per_second=frames_per_second,
@@ -107,16 +108,44 @@ class VideoCapture:
         except RuntimeError as e:
             rospy.logerr(e)
 
+def main(argv):
+    user = ''
+    participant = ''
+    try:
+        opts, args = getopt.getopt(argv,"hu:p:",["user=","participant="])
+    except getopt.GetoptError:
+        print('test.py -u <user> -p <participant>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('test.py -u <user> -p <participant>')
+            sys.exit()
+        elif opt in ("-u", "--user"):
+            user = arg
+        elif opt in ("-p", "--participant"):
+            participant = arg
+
+    print(f"PC user is {user}, participant is {participant}")
+    return user, participant
 
 if __name__ == "__main__":
-    # TODO parameters as ROS parameters
-    color_image_topic = "/camera/color/image_raw"
-    depth_image_topic = "/camera/depth/image_raw"
-    is_record_topic = "/qt_robot_video_recording/is_record"
-    video_type = "mp4"
-    video_dimensions = "480p"
-    frames_per_second = 30
-    output_directory = "/home/qtrobot/Documents"
+    user = 'michal'
+    participant = '1'
+    #user, participant = main(sys.argv[1:])
+    path = f"/home/{user}/videos/{participant}"
+    try:
+        os.makedirs(path)
+    except FileExistsError as err:
+        print(f"WARNING: Directory {path} already exists")
+
+    output_directory = rospy.get_param('~output_directory', path)
+    color_image_topic = rospy.get_param('~color_image_topic', '/camera/color/image_raw')
+    depth_image_topic = rospy.get_param('~depth_image_topic', '/camera/depth/image_raw')
+    is_record_topic = rospy.get_param('~is_record_topic', "/qt_robot_video_recording/is_record")
+    video_type = rospy.get_param('~video_type', "mp4")
+    video_dimensions = rospy.get_param('~video_dimensions', "480p")
+    frames_per_second = rospy.get_param('~frames_per_second', 30)
+
     VideoCapture(
         color_image_topic=color_image_topic,
         depth_image_topic=depth_image_topic,
