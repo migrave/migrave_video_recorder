@@ -8,7 +8,7 @@
   <arg name="frames_per_second" default="30"/>
   <arg name="output_directory" default="/home/qtrobot/Documents"/>
 
-  <node name="migrave_video_recorder" pkg="migrave_video_recorder" type="migrave_video_recorder.py" output="screen">
+  <node name="migrave_video_recorder" pkg="migrave_video_recorder" type="migrave_video_recorder.py" output="screen" respawn="true">
     <param name="color_image_topic" value="$(arg color_image_topic)" />
     <param name="depth_image_topic" value="$(arg depth_image_topic)" />
     <param name="is_record_topic" value="$(arg is_record_topic)" />
@@ -18,7 +18,7 @@
     <param name="output_directory" value="$(arg output_directory)" />
   </node>
 
-  <node name="migrave_webcam_recorder" pkg="migrave_video_recorder" type="migrave_webcam_recorder.py" output="screen">
+  <node name="migrave_webcam_recorder" pkg="migrave_video_recorder" type="migrave_webcam_recorder.py" output="screen" respawn="true">
   </node>
   
 </launch>
