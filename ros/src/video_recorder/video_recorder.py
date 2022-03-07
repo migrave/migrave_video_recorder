@@ -3,7 +3,7 @@ import datetime
 from pathlib import Path
 
 
-class video_recorder:
+class VideoRecorder:
     video_type_code = {
         "avi": cv2.VideoWriter_fourcc(*"DIVX"),
         "mp4": cv2.VideoWriter_fourcc(*"mp4v"),

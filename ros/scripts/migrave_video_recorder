@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
 import rospy
 from sensor_msgs.msg import Image
 from std_msgs.msg import Bool
@@ -7,7 +7,7 @@ from cv_bridge import CvBridge, CvBridgeError
 from datetime import datetime
 import cv2
 
-from video_recorder.video_recorder import video_recorder
+from video_recorder.video_recorder import VideoRecorder
 
 
 class VideoCapture:
@@ -24,14 +24,14 @@ class VideoCapture:
     ):
 
         rospy.init_node("migrave_video_recorder", anonymous=True)
-        self._color_video_recorder = video_recorder(
+        self._color_video_recorder = VideoRecorder(
             video_type=video_type,
             video_dimensions=video_dimensions_color,
             frames_per_second=frames_per_second,
             out_directory=out_directory,
         )
 
-        self._depth_video_recorder = video_recorder(
+        self._depth_video_recorder = VideoRecorder(
             video_type=video_type,
             video_dimensions=video_dimensions_depth,
             frames_per_second=frames_per_second,
