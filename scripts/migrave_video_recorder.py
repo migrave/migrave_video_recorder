@@ -22,7 +22,6 @@ class VideoCapture:
         out_directory,
     ):
 
-        rospy.init_node("video_ros_recorder", anonymous=True)
         self._color_video_recorder = VideoRecorder(
             video_type=video_type,
             video_dimensions=video_dimensions,
@@ -129,22 +128,22 @@ def main(argv):
     return user, participant
 
 if __name__ == "__main__":
-    user = 'michal'
-    participant = '1'
     #user, participant = main(sys.argv[1:])
-    path = f"/home/{user}/videos/{participant}"
-    try:
-        os.makedirs(path)
-    except FileExistsError as err:
-        print(f"WARNING: Directory {path} already exists")
 
-    output_directory = rospy.get_param('~output_directory', path)
+    rospy.init_node("migrave_video_recorder", anonymous=True)
+    node_name = rospy.get_name()
+    path = rospy.get_param(node_name+'/output_directory')
     color_image_topic = rospy.get_param('~color_image_topic', '/camera/color/image_raw')
     depth_image_topic = rospy.get_param('~depth_image_topic', '/camera/depth/image_raw')
     is_record_topic = rospy.get_param('~is_record_topic', "/qt_robot_video_recording/is_record")
     video_type = rospy.get_param('~video_type', "mp4")
     video_dimensions = rospy.get_param('~video_dimensions', "480p")
-    frames_per_second = rospy.get_param('~frames_per_second', 30)
+    frames_per_second = rospy.get_param('~frames_per_second', 15)
+
+    try:
+        os.makedirs(path)
+    except FileExistsError as err:
+        print(f"WARNING: Directory {path} already exists")
 
     VideoCapture(
         color_image_topic=color_image_topic,
@@ -153,7 +152,7 @@ if __name__ == "__main__":
         video_type=video_type,
         video_dimensions=video_dimensions,
         frames_per_second=frames_per_second,
-        out_directory=output_directory,
+        out_directory=path,
     )
 
     rospy.spin()
