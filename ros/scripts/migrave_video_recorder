@@ -88,7 +88,12 @@ class VideoCapture:
                 if self._allow_recording:
                     # rospy.loginfo("Starting to record video")
                     ext = video_type
-                    file_name = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                    now = datetime.now()
+                    # time in YYYY-MM-DD_HH_MM-SS format
+                    time = now.strftime("%Y-%m-%d_%H-%M-%S")
+                    # unixtimestamp 16 digits
+                    stamp = int(datetime.timestamp(now) * 1000000)
+                    file_name = f"{time}_{stamp}"
                     color_video_file = f"color_{file_name}.{ext}"
                     depth_video_file = f"depth_{file_name}.{ext}"
                     rospy.loginfo("Starting to record color video")
@@ -125,7 +130,7 @@ if __name__ == "__main__":
     video_dimensions_color = "480p"
     video_dimensions_depth = "480p"
     frames_per_second = 30
-    output_directory = "/home/qtrobot/Documents"
+    output_directory = "/home/qtrobot/Documents/migrave"
     # update parameter if provided by ros parameter server
     parameter_name = "/migrave_video_recorder/color_image_topic"
     if rospy.has_param(parameter_name):
@@ -158,10 +163,6 @@ if __name__ == "__main__":
     parameter_name = "/migrave_video_recorder/frames_per_second"
     if rospy.has_param(parameter_name):
         frames_per_second = rospy.get_param(parameter_name)
-
-    parameter_name = "/migrave_video_recorder/out_directory"
-    if rospy.has_param(parameter_name):
-        out_directory = rospy.get_param(parameter_name)
 
     VideoCapture(
         color_image_topic=color_image_topic,
