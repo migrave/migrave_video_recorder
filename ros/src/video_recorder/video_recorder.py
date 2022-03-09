@@ -50,7 +50,7 @@ class VideoRecorder:
     def start_recording(self, out_file_name=None):
 
         if self._is_recording:
-            raise RuntimeError("Video is alrady being recorded")
+            raise RuntimeError("Video is already being recorded")
 
         # parameter set by migrave_games
         parameter_name = "/migrave/game_performance/participant_id"
