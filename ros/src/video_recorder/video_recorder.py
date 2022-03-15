@@ -56,8 +56,10 @@ class VideoRecorder:
         parameter_name = "/migrave/game_performance/participant_id"
         if rospy.has_param(parameter_name):
             participant_id = rospy.get_param(parameter_name)
-        if participant_id == "":
-            rospy.loginfo("Participant ID not set!")
+            if participant_id == "":
+                rospy.loginfo("Participant ID not set!")
+                participant_id = "ID_Unknown"
+        else:
             participant_id = "ID_Unknown"
 
         self._out_directory_id = Path(self._out_directory) / participant_id
