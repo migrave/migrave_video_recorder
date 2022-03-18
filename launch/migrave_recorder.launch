@@ -5,16 +5,16 @@
     <arg name="is_record_topic" default="/qt_robot_recording/is_record" />
 
     <node pkg="migrave_video_recorder" type="migrave_video_recorder.py" name="migrave_video_recorder" output="screen">
-        <param name="output_directory" type="str" value="/home/$(arg user)/$(arg participant)/video/" />
+        <param name="output_directory" type="str" value="/home/$(arg user)/experiments/$(arg participant)/video/" />
         <param name="color_image_topic" type="str" value="/camera/color/image_raw" />
         <param name="depth_image_topic" type="str" value="/camera/depth/image_raw" />
         <param name="is_record_topic" type="str" value="$(arg is_record_topic)" />
         <param name="video_type" type="str" value="mp4" />
         <param name="video_dimensions" type="str" value="480p" />
-        <param name="frames_per_second" type="int" value="15" />
+        <param name="frames_per_second" type="int" value="30" />
     </node>
     <node pkg="migrave_video_recorder" type="migrave_audio_recorder.py" name="migrave_audio_recorder" output="screen">
-        <param name="output_directory" type="str" value="/home/$(arg user)/$(arg participant)/audio" />
+        <param name="output_directory" type="str" value="/home/$(arg user)/experiments/$(arg participant)/audio" />
         <param name="channel_topic" type="str" value="/qt_respeaker_app/channel0" />
         <param name="is_record_topic" type="str" value="$(arg is_record_topic)" />
         <param name="audio_rate" type="int" value="16000" />

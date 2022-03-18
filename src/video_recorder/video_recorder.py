@@ -45,6 +45,11 @@ class VideoRecorder:
 
         self._is_recording = False
         self._video_writer = None
+        self._timestamp_writer = None
+
+    def __del__(self):
+        if self._timestamp_writer is not None:
+            self._timestamp_writer.close()
 
     def start_recording(self, out_file_name=None):
 
@@ -67,11 +72,17 @@ class VideoRecorder:
             self._video_dimensions,
             True,
         )
+
+        timestamp_file_name = out_file_path[:-3] + 'txt'
+        self._timestamp_writer = open(timestamp_file_name, "a")
+        
         self._is_recording = True
 
     def add_image(self, image, is_throw_error_if_not_recording=True):
 
         if self._is_recording:
+            timestamp = datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3] + "\n"
+            self._timestamp_writer.write(timestamp)
             self._video_writer.write(image)
         else:
             if is_throw_error_if_not_recording:
@@ -84,3 +95,6 @@ class VideoRecorder:
 
         self._video_writer = None
         self._is_recording = False
+
+        if self._timestamp_writer is not None:
+            self._timestamp_writer.close()

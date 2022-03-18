@@ -138,7 +138,7 @@ if __name__ == "__main__":
     is_record_topic = rospy.get_param('~is_record_topic', "/qt_robot_video_recording/is_record")
     video_type = rospy.get_param('~video_type', "mp4")
     video_dimensions = rospy.get_param('~video_dimensions', "480p")
-    frames_per_second = rospy.get_param('~frames_per_second', 15)
+    frames_per_second = rospy.get_param('~frames_per_second', 30)
 
     try:
         os.makedirs(path)
