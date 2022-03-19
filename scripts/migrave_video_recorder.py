@@ -133,12 +133,12 @@ if __name__ == "__main__":
     rospy.init_node("migrave_video_recorder", anonymous=True)
     node_name = rospy.get_name()
     path = rospy.get_param(node_name+'/output_directory')
-    color_image_topic = rospy.get_param('~color_image_topic', '/camera/color/image_raw')
-    depth_image_topic = rospy.get_param('~depth_image_topic', '/camera/depth/image_raw')
-    is_record_topic = rospy.get_param('~is_record_topic', "/qt_robot_video_recording/is_record")
-    video_type = rospy.get_param('~video_type', "mp4")
-    video_dimensions = rospy.get_param('~video_dimensions', "480p")
-    frames_per_second = rospy.get_param('~frames_per_second', 30)
+    color_image_topic = rospy.get_param(node_name+'/color_image_topic', '/camera/color/image_raw')
+    depth_image_topic = rospy.get_param(node_name+'/depth_image_topic', '/camera/depth/image_raw')
+    is_record_topic = rospy.get_param(node_name+'/is_record_topic', "/qt_robot_video_recording/is_record")
+    video_type = rospy.get_param(node_name+'/video_type', "mp4")
+    video_dimensions = rospy.get_param(node_name+'/video_dimensions', "480p")
+    frames_per_second = rospy.get_param(node_name+'/frames_per_second', 30)
 
     try:
         os.makedirs(path)

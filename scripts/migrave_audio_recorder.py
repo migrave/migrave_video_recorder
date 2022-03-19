@@ -76,12 +76,12 @@ if __name__ == "__main__":
     rospy.init_node("migrave_audio_recorder", anonymous=True)
     node_name = rospy.get_name()
     path = rospy.get_param(node_name+'/output_directory', "/home/qtrobot/1/audio/")
-    audio_topic = rospy.get_param('~channel_topic', "/qt_respeaker_app/channel0")
-    is_record_topic = rospy.get_param('~is_record_topic', "/qt_robot_audio_recording/is_record")
-    audio_rate = rospy.get_param('~audio_rate', 16000)
-    audio_channels = rospy.get_param('~audio_channel', 1)
-    audio_width = rospy.get_param('~audio_width', 2)
-    audio_type = rospy.get_param('~audio_type', "wav")
+    audio_topic = rospy.get_param(node_name+'/channel_topic', "/qt_respeaker_app/channel0")
+    is_record_topic = rospy.get_param(node_name+'/is_record_topic', "/qt_robot_audio_recording/is_record")
+    audio_rate = rospy.get_param(node_name+'/audio_rate', 16000)
+    audio_channels = rospy.get_param(node_name+'/audio_channel', 1)
+    audio_width = rospy.get_param(node_name+'/audio_width', 2)
+    audio_type = rospy.get_param(node_name+'audio_type', "wav")
 
     try:
         os.makedirs(path)
