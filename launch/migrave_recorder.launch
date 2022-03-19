@@ -22,4 +22,11 @@
         <param name="audio_width" type="int" value="2" />
         <param name="audio_type" type="str" value="wav" />
     </node>
+    <node pkg="migrave_video_recorder" type="migrave_mobile_stream_recorder.py" name="migrave_mobile_stream_recorder" output="screen">
+        <param name="output_directory" type="str" value="/home/$(arg user)/experiments/$(arg participant)/video/" />
+        <param name="stream_url" type="str" value="http://192.168.50.49:8080/stream.mjpeg" />
+        <param name="is_record_topic" type="str" value="$(arg is_record_topic)" />
+        <param name="video_type" type="str" value="mp4" />
+        <param name="frames_per_second" type="int" value="20" />
+    </node>
 </launch>
