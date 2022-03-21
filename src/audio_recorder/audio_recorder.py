@@ -1,6 +1,6 @@
 import wave
 from pathlib import Path
-import datetime
+import time
 
 
 class AudioRecorder:
@@ -20,16 +20,20 @@ class AudioRecorder:
         self._out_directory = out_directory
 
         self._is_recording = False
+        self._timestamp_writer = None
 
     def start_recording(self, out_file_name=None):
 
         if self._is_recording:
             raise RuntimeError("Audio is already being recorded")
+        
         if not Path(self._out_directory).is_dir():
             Path(self._out_directory).mkdir()
+        
         if out_file_name is None:
             ext = self._audio_type
-            file_name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            t = time.localtime()
+            file_name = time.strftime("%Y-%m-%d_%H-%M-%S", t)
             out_file_name = f"{file_name}.{ext}"
 
         out_file_path = Path(self._out_directory) / out_file_name
@@ -38,10 +42,16 @@ class AudioRecorder:
         self._wf.setnchannels(self._audio_channels)
         self._wf.setsampwidth(self._audio_width)
         self._wf.setframerate(self._audio_rate)
+        
+        timestamp_file_name = out_file_path[:-3] + 'txt'
+        self._timestamp_writer = open(timestamp_file_name, "a")
+
         self._is_recording = True
 
     def add_audio(self, audio, is_throw_error_if_not_recording=True):
         if self._is_recording:
+            timestamp = str(int(round(time.time() * 1000))) + "\n"
+            self._timestamp_writer.write(timestamp)
             self._wf.writeframes(audio)
         else:
             if is_throw_error_if_not_recording:
@@ -53,3 +63,6 @@ class AudioRecorder:
 
         self._wf.close()
         self._is_recording = False
+
+        if self._timestamp_writer is not None:
+            self._timestamp_writer.close()

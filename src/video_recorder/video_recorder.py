@@ -1,6 +1,6 @@
 import cv2
-import datetime
 from pathlib import Path
+import time
 
 
 class VideoRecorder:
@@ -59,8 +59,10 @@ class VideoRecorder:
         if not Path(self._out_directory).is_dir():
             Path(self._out_directory).mkdir()
         if out_file_name is None:
-            ext = self._video_type
-            file_name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            ext = self._video_type 
+
+            t = time.localtime()
+            file_name = time.strftime("%Y-%m-%d_%H-%M-%S", t)
             out_file_name = f"{file_name}.{ext}"
 
         out_file_path = Path(self._out_directory) / out_file_name
@@ -81,7 +83,7 @@ class VideoRecorder:
     def add_image(self, image, is_throw_error_if_not_recording=True):
 
         if self._is_recording:
-            timestamp = datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3] + "\n"
+            timestamp = str(int(round(time.time() * 1000))) + "\n"
             self._timestamp_writer.write(timestamp)
             self._video_writer.write(image)
         else:

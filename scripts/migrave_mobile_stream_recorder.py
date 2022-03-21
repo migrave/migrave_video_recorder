@@ -2,7 +2,7 @@
 
 import cv2
 import rospy
-import datetime
+import time
 from pathlib import Path
 from std_msgs.msg import Bool
 
@@ -49,7 +49,7 @@ class MobileStreamRecorder:
             is_opened = self._cap.isOpened()
             if not is_opened:
                 rospy.logwarn("Could not intialize video capture, retrying ...")
-                is_opened.open(stream_url)
+                self._cap.open(stream_url)
                 rospy.sleep(1)
             else:
                 break
@@ -84,7 +84,8 @@ class MobileStreamRecorder:
 
         if out_file_name is None:
             ext = self._video_type
-            file_name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            t = time.localtime()
+            file_name = time.strftime("%Y-%m-%d_%H-%M-%S", t)
             out_file_name = f"mobile_stream_{file_name}.{ext}"
 
         out_file_path = Path(self._out_directory) / out_file_name
@@ -114,7 +115,7 @@ class MobileStreamRecorder:
 
     def add_image(self, image, is_throw_error_if_not_recording=True):
         if self._is_recording:
-            timestamp = datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3] + "\n"
+            timestamp = str(int(round(time.time() * 1000))) + "\n"
             self._timestamp_writer.write(timestamp)
             self._video_writer.write(image)
 
