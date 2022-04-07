@@ -3,6 +3,7 @@ import datetime
 from pathlib import Path
 import rospy
 
+
 class VideoRecorder:
     video_type_code = {
         "avi": cv2.VideoWriter_fourcc(*"DIVX"),
@@ -26,16 +27,16 @@ class VideoRecorder:
     ):
         if video_type not in self.video_type_code:
             raise KeyError(
-                    f"Invalid video type, "
-                    f"please use one of the following:"
-                    f"{self.video_type_code.keys()}"
+                f"Invalid video type, "
+                f"please use one of the following:"
+                f"{self.video_type_code.keys()}"
             )
 
         if video_dimensions not in self.std_dimensions:
             raise KeyError(
-                    f"Invalid video dimensions, "
-                    f"please use one of the following:"
-                    f"{self.std_dimensions.keys()}"
+                f"Invalid video dimensions, "
+                f"please use one of the following:"
+                f"{self.std_dimensions.keys()}"
             )
 
         self._video_type = video_type
@@ -46,6 +47,11 @@ class VideoRecorder:
 
         self._is_recording = False
         self._video_writer = None
+        self._timestamp_writer = None
+
+    def __del__(self):
+        if self._timestamp_writer is not None:
+            self._timestamp_writer.close()
 
     def start_recording(self, out_file_name=None):
 
@@ -84,11 +90,20 @@ class VideoRecorder:
             self._video_dimensions,
             True,
         )
+
+        timestamp_file_name = out_file_path[:-3] + 'txt'
+        self._timestamp_writer = open(timestamp_file_name, "a")
+
         self._is_recording = True
 
     def add_image(self, image, is_throw_error_if_not_recording=True):
 
         if self._is_recording:
+            now = datetime.datetime.now()
+            # unixtimestamp 16 digits
+            timestamp = int(datetime.datetime.timestamp(now) * 1000000)
+            timestamp = str(timestamp) + "\n"
+            self._timestamp_writer.write(timestamp)
             self._video_writer.write(image)
         else:
             if is_throw_error_if_not_recording:
@@ -101,3 +116,5 @@ class VideoRecorder:
 
         self._video_writer = None
         self._is_recording = False
+        if self._timestamp_writer is not None:
+            self._timestamp_writer.close()
