@@ -1,6 +1,6 @@
 <launch>
   <arg name="color_image_topic" default="/camera/color/image_raw"/>
-  <arg name="depth_image_topic" default="/camera/aligned_depth_to_color/image_raw"/>
+  <arg name="depth_image_topic" default="/camera/depth/image_raw"/>
   <arg name="is_record_topic" default="/migrave_data_recording/is_record"/>
   <arg name="video_type" default="mp4"/>
   <arg name="video_dimensions_color" default="480p"/>
