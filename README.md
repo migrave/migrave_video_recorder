@@ -43,3 +43,24 @@ Stop recording
 ```sh
 rostopic pub /migrave_data_recorder/is_record std_msgs/Bool "False"
 ```
+
+## Project Structure
+```
+├── CMakeLists.txt
+├── LICENSE
+├── README.md
+├── package.xml
+├── ros
+│   ├── launch
+│   │   ├── migrave_video_recorder.launch
+│   │   ├── rs_camera.launch
+│   │   └── usb_cam_both.launch
+│   ├── scripts
+│   │   ├── migrave_video_recorder
+│   │   └── migrave_webcam_recorder
+│   └── src
+│       └── video_recorder
+│           ├── __init__.py
+│           └── video_recorder.py
+└── setup.py
+```
